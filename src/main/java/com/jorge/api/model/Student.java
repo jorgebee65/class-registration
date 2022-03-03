@@ -40,10 +40,8 @@ public class Student {
     private Set<Course> courses = new HashSet<>();
 
     public void addCourse(Course course){
-        if(courses == null){
-            courses = new HashSet<>();
-        }
-        courses.add(course);
+        this.courses.add(course);
+        course.getStudents().add(this);
     }
 
     @Override
@@ -52,5 +50,20 @@ public class Student {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Student student = (Student) o;
+
+        return id.equals(student.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 }
