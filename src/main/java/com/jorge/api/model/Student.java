@@ -1,5 +1,6 @@
 package com.jorge.api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,16 +28,15 @@ public class Student {
     @ManyToMany(
             fetch = FetchType.LAZY,
             cascade = {
-            CascadeType.MERGE,
-            CascadeType.PERSIST,
-            CascadeType.DETACH,
-            CascadeType.REFRESH
+                CascadeType.MERGE,
+                CascadeType.PERSIST
     })
     @JoinTable(
             name = "Student_Courses",
             joinColumns = { @JoinColumn(name = "student_id") },
             inverseJoinColumns = { @JoinColumn(name = "course_id") }
     )
+    @JsonIgnore
     private Set<Course> courses = new HashSet<>();
 
     public void addCourse(Course course){

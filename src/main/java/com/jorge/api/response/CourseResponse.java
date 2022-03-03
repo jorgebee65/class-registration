@@ -7,5 +7,5 @@ import lombok.Data;
 @Builder
 public class CourseResponse {
     private Long id;
-    private Long name;
+    private String name;
 }
