@@ -1,6 +1,5 @@
 package com.jorge.api.request;
 
-import com.jorge.api.model.Course;
 import lombok.Builder;
 import lombok.Data;
 

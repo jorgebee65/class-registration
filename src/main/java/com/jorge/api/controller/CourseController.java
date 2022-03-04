@@ -1,8 +1,10 @@
 package com.jorge.api.controller;
 
-import com.jorge.api.exception.ResourceNotFoundException;
+import com.jorge.api.exception.ApiRequestException;
 import com.jorge.api.model.Course;
 import com.jorge.api.request.CourseRequest;
+import com.jorge.api.response.CourseFullResponse;
+import com.jorge.api.response.CourseResponse;
 import com.jorge.api.response.StudentResponse;
 import com.jorge.api.service.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -33,7 +34,7 @@ public class CourseController {
     @GetMapping("/courses/{id}")
     public ResponseEntity<Course> getCourseById(@PathVariable("id") long id) {
         Course course = courseService.getCourseById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Not found Course with id = " + id));
+                .orElseThrow(() -> new ApiRequestException("Not found Course with id = " + id));
         return new ResponseEntity<>(course, HttpStatus.OK);
     }
 
@@ -62,5 +63,25 @@ public class CourseController {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(allStudentsFromCourse, HttpStatus.OK);
+    }
+
+    @GetMapping("/courses/empty")
+    public ResponseEntity<List<CourseResponse>> getEmptyCourses(){
+        List<CourseResponse> courses = courseService.getCoursesWithoutStudents();
+
+        if(courses.isEmpty()){
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+    }
+
+    @GetMapping("/courses/full")
+    public ResponseEntity<List<CourseFullResponse>> getCoursesAndStudentsRelationship(){
+        List<CourseFullResponse> courses = courseService.getCoursesWithStudents();
+
+        if(courses.isEmpty()){
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(courses, HttpStatus.OK);
     }
 }

@@ -48,4 +48,11 @@ public class Course {
     public int hashCode() {
         return id.hashCode();
     }
+
+    public Set<Student> getStudents() {
+        if(students == null){
+            return new HashSet<>();
+        }
+        return students;
+    }
 }

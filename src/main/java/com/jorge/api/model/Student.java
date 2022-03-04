@@ -40,8 +40,15 @@ public class Student {
     private Set<Course> courses = new HashSet<>();
 
     public void addCourse(Course course){
-        this.courses.add(course);
+        this.getCourses().add(course);
         course.getStudents().add(this);
+    }
+
+    public Set<Course> getCourses() {
+        if(courses==null){
+            courses = new HashSet<>();
+        }
+        return courses;
     }
 
     @Override
@@ -60,10 +67,5 @@ public class Student {
         Student student = (Student) o;
 
         return id.equals(student.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return id.hashCode();
     }
 }
