@@ -1,11 +1,28 @@
-database:
-  image: mysql:5.7
-  ports:
-    - "3306:3306"
-  command: --init-file /data/application/init.sql
-  volumes:
-    - ./init.sql:/data/application/init.sql
-  environment:
-    MYSQL_ROOT_USER: root
-    MYSQL_ROOT_PASSWORD: my-secret-pw
-    MYSQL_DATABASE: dev
+version: "3"
+services:
+
+  mysqldb:
+    image: mysql:5.7
+    restart: always
+    ports:
+      - "3306:3306"
+    expose:
+      # Opens port 3306 on the container
+      - '3306'
+    command: --init-file /data/application/init.sql
+    volumes:
+      - ./init.sql:/data/application/init.sql
+    environment:
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: my-secret-pw
+      MYSQL_DATABASE: dev
+  app:
+    image: springboot
+    depends_on:
+      - mysqldb
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysqldb:3306/dev?useSSL=false&allowPublicKeyRetrieval=true
+    build: ./
+    restart: on-failure
+    ports:
+      - 8080:8080
