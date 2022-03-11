@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,8 +26,8 @@ public class StudentService {
         return studentRepository.findAll();
     }
 
-    public Optional<Student> getStudentById(Long id){
-        return studentRepository.findById(id);
+    public Student getStudentById(Long id){
+        return studentRepository.findById(id).orElseThrow(() -> new ApiRequestException("Not found Student with id = " + id));
     }
 
     public List<CourseResponse> getCoursesByStudent(Long id){
@@ -54,6 +53,10 @@ public class StudentService {
     }
 
     public void delete(Long id){
+        boolean exist = studentRepository.existsById(id);
+        if(!exist){
+            throw new ApiRequestException("Student with Id: "+id+" does not exist");
+        }
         studentRepository.deleteById(id);
     }
 

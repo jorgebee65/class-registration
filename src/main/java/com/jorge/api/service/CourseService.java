@@ -28,8 +28,9 @@ public class CourseService {
         return courseRepository.findAll();
     }
 
-    public Optional<Course> getCourseById(Long id){
-        return courseRepository.findById(id);
+    public Course getCourseById(Long id){
+        return courseRepository
+                .findById(id).orElseThrow(() -> new ApiRequestException("Not found Course with id = " + id));
     }
 
     public List<StudentResponse> getAllStudentsFromCourse(Long id){
@@ -55,6 +56,10 @@ public class CourseService {
     }
 
     public void delete(Long id){
+        boolean exist = courseRepository.existsById(id);
+        if(!exist){
+            throw new ApiRequestException("Not found Course with Id: "+id);
+        }
         courseRepository.deleteById(id);
     }
 

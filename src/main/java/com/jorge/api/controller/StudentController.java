@@ -6,7 +6,6 @@ import com.jorge.api.request.StudentRequest;
 import com.jorge.api.response.CourseResponse;
 import com.jorge.api.response.StudentResponse;
 import com.jorge.api.service.StudentService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,8 +16,11 @@ import java.util.List;
 @RequestMapping("/api/v1/students")
 public class StudentController {
 
-    @Autowired
-    private StudentService studentService;
+    private final StudentService studentService;
+
+    public StudentController(StudentService studentService) {
+        this.studentService = studentService;
+    }
 
     @GetMapping
     public ResponseEntity<List<Student>> getAllCourses(){
@@ -32,9 +34,7 @@ public class StudentController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Student> getCourseById(@PathVariable("id") long id) {
-        Student student = studentService.getStudentById(id)
-                .orElseThrow(() -> new ApiRequestException("Not found Student with id = " + id));
-        return new ResponseEntity<>(student, HttpStatus.OK);
+        return new ResponseEntity<>(studentService.getStudentById(id), HttpStatus.OK);
     }
 
     @PostMapping
