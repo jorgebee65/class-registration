@@ -257,7 +257,7 @@ public class RegisterServiceTest {
         Exception exception = assertThrows(ApiRequestException.class, () -> {
             registerService.save(registerRequest);
         });
-        String expectedMessage = "You are trying to register a duplicate Course: 'JUnit'";
+        String expectedMessage = "You are trying to register a duplicate Course: JUnit";
         String actualMessage = exception.getMessage();
         //Then
         assertTrue(actualMessage.contains(expectedMessage));
