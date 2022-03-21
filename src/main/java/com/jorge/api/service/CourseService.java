@@ -7,6 +7,7 @@ import com.jorge.api.request.CourseRequest;
 import com.jorge.api.response.CourseFullResponse;
 import com.jorge.api.response.CourseResponse;
 import com.jorge.api.response.StudentResponse;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,12 +41,21 @@ public class CourseService {
 
 
     public Course save(CourseRequest courseRequest){
+        if(StringUtils.isEmpty(courseRequest.getName())){
+            throw new ApiRequestException("The Course name is required");
+        }
+        if(!courseRepository.findByNameEquals(courseRequest.getName()).isEmpty()){
+            throw new ApiRequestException("The Course with name "+courseRequest.getName()+" already exist");
+        }
         return courseRepository.save(Course.builder()
                 .name(courseRequest.getName())
                 .build());
     }
 
     public Course update(Long id, CourseRequest courseRequest){
+        if(StringUtils.isEmpty(courseRequest.getName())){
+            throw new ApiRequestException("The Course name is required");
+        }
         Course course = courseRepository.findById(id)
                 .orElseThrow(()-> new ApiRequestException("Not found Course with Id: "+id));
         course.setName(courseRequest.getName());

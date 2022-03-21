@@ -11,4 +11,7 @@ spring:
     username: root
     password: my-secret-pw
     driver-class-name: com.mysql.cj.jdbc.Driver
+app:
+  max-courses-per-student: 5
+  max-students-per-course: 50
 

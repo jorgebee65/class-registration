@@ -24,7 +24,7 @@ class CourseRepositoryTest {
         Course course = Course.builder().name("Java").build();
         courseRepository.saveAndFlush(course);
         //when
-        List<EmptyEntity> emptyEntities = courseRepository.fetchCoursesWithoutStudents();
+        List<IEmptyEntity> emptyEntities = courseRepository.fetchCoursesWithoutStudents();
         //then
         assertFalse(emptyEntities.isEmpty());
     }

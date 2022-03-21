@@ -26,7 +26,7 @@ class StudentRepositoryTest {
                 .build();
         studentRepository.save(student);
         //when
-        List<EmptyEntity> emptyEntities = studentRepository.fetchStudentsWithoutCourses();
+        List<IEmptyEntity> emptyEntities = studentRepository.fetchStudentsWithoutCourses();
         //then
         assertFalse(emptyEntities.isEmpty());
     }
