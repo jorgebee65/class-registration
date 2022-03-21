@@ -3,7 +3,6 @@ package com.jorge.api.service;
 import com.jorge.api.exception.ApiRequestException;
 import com.jorge.api.model.Course;
 import com.jorge.api.repository.CourseRepository;
-import com.jorge.api.repository.StudentRepository;
 import com.jorge.api.request.CourseRequest;
 import com.jorge.api.response.CourseFullResponse;
 import com.jorge.api.response.CourseResponse;
@@ -13,16 +12,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class CourseService {
     @Autowired
     private CourseRepository courseRepository;
-
-    @Autowired
-    private StudentRepository studentRepository;
 
     public List<Course> getAllCourses(){
         return courseRepository.findAll();
@@ -34,13 +29,15 @@ public class CourseService {
     }
 
     public List<StudentResponse> getAllStudentsFromCourse(Long id){
-        return studentRepository.findStudentsByCoursesId(id).stream()
+        return courseRepository.findById(id).orElseThrow(() -> new ApiRequestException("Not found Course with id = " + id)).getStudents().stream()
                 .map(student -> StudentResponse.builder()
                         .id(student.getId())
                         .name(student.getName())
                         .build()
                 ).collect(Collectors.toList());
     }
+
+
 
     public Course save(CourseRequest courseRequest){
         return courseRepository.save(Course.builder()
@@ -73,19 +70,17 @@ public class CourseService {
 
     public List<CourseFullResponse> getCoursesWithStudents(){
         List<CourseFullResponse> courses = new ArrayList<>();
-        courseRepository.findAll().forEach(course -> {
-            courses.add(CourseFullResponse.builder()
-                    .id(course.getId())
-                            .name(course.getName())
-                                    .students(studentRepository.findStudentsByCoursesId(course.getId()).stream()
-                                            .map(student -> StudentResponse.builder()
-                                                    .id(student.getId())
-                                                    .name(student.getName())
-                                                    .build())
-                                            .collect(Collectors.toList()))
-                    .build());
-
-        });
+        courseRepository.findAll().forEach(course -> courses.add(CourseFullResponse.builder()
+                .id(course.getId())
+                        .name(course.getName())
+                                .students( course.getStudents().stream()
+                                        .map(student -> StudentResponse.builder()
+                                                .id(student.getId())
+                                                .name(student.getName())
+                                                .build()
+                                        ).collect(Collectors.toList())
+                                )
+                .build()));
         return courses;
     }
 }

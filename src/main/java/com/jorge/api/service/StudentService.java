@@ -2,7 +2,6 @@ package com.jorge.api.service;
 
 import com.jorge.api.exception.ApiRequestException;
 import com.jorge.api.model.Student;
-import com.jorge.api.repository.CourseRepository;
 import com.jorge.api.repository.StudentRepository;
 import com.jorge.api.request.StudentRequest;
 import com.jorge.api.response.CourseResponse;
@@ -17,9 +16,6 @@ import java.util.stream.Collectors;
 public class StudentService {
 
     @Autowired
-    private CourseRepository courseRepository;
-
-    @Autowired
     private StudentRepository studentRepository;
 
     public List<Student> getAllStudents(){
@@ -31,7 +27,7 @@ public class StudentService {
     }
 
     public List<CourseResponse> getCoursesByStudent(Long id){
-        return courseRepository.findCoursesByStudentsId(id).stream()
+        return getStudentById(id).getCourses().stream()
                 .map(course -> CourseResponse.builder()
                         .id(course.getId())
                         .name(course.getName())
