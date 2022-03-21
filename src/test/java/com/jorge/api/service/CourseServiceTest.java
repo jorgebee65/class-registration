@@ -1,10 +1,13 @@
 package com.jorge.api.service;
 
+import com.jorge.api.exception.ApiRequestException;
 import com.jorge.api.model.Course;
 import com.jorge.api.model.Student;
 import com.jorge.api.repository.CourseRepository;
-import com.jorge.api.repository.EmptyEntity;
+import com.jorge.api.repository.EmptyEntityImpl;
+import com.jorge.api.repository.IEmptyEntity;
 import com.jorge.api.request.CourseRequest;
+import com.jorge.api.request.RegisterRequest;
 import com.jorge.api.response.CourseFullResponse;
 import com.jorge.api.response.CourseResponse;
 import com.jorge.api.response.StudentResponse;
@@ -12,8 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +33,29 @@ class CourseServiceTest {
 
     @MockBean
     private CourseRepository courseRepository;
+
+    @Test
+    public void saveShouldThrowAnExceptionWhenNameIsMissing() {
+        Exception exception = assertThrows(ApiRequestException.class, () -> {
+            courseService.save(CourseRequest.builder().name(null).build());
+        });
+        String expectedMessage = "The Course name is required";
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    public void saveShouldThrowAnExceptionWhenNameIsDuplicated() {
+        when(courseRepository.findByNameEquals(any()))
+                .thenReturn(Stream.of(Course.builder().id(1L).name("Java").build()).collect(Collectors.toList()));
+
+        Exception exception = assertThrows(ApiRequestException.class, () -> {
+            courseService.save(CourseRequest.builder().name("Java").build());
+        });
+        String expectedMessage = "The Course with name Java already exist";
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
 
     @Test
     void getAllCourses() {
@@ -100,6 +124,16 @@ class CourseServiceTest {
     }
 
     @Test
+    public void updateShouldThrowAnExceptionWhenNameIsMissing() {
+        Exception exception = assertThrows(ApiRequestException.class, () -> {
+            courseService.update(1L, CourseRequest.builder().name(null).build());
+        });
+        String expectedMessage = "The Course name is required";
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
     void delete() {
         //Given
         when(courseRepository.existsById(any())).thenReturn(true);
@@ -111,9 +145,20 @@ class CourseServiceTest {
     }
 
     @Test
+    public void deleteShouldThrowAnExceptionWhenCourseDoesNotExist() {
+        when(courseRepository.existsById(any())).thenReturn(false);
+        Exception exception = assertThrows(ApiRequestException.class, () -> {
+            courseService.delete(1L);
+        });
+        String expectedMessage = "Not found Course with Id: 1";
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
     void getCoursesWithoutStudents() {
         //Given
-        List<EmptyEntity> emptyEntities = Stream.of(EmptyEntity.builder().id(1L).name("Java").build()).collect(Collectors.toList());
+        List<IEmptyEntity> emptyEntities = Stream.of(new EmptyEntityImpl(1L, "Java")).collect(Collectors.toList());
         when(courseRepository.fetchCoursesWithoutStudents()).thenReturn(emptyEntities);
         //When
         List<CourseResponse> coursesFound = courseService.getCoursesWithoutStudents();

@@ -1,8 +1,10 @@
 package com.jorge.api.service;
 
+import com.jorge.api.exception.ApiRequestException;
 import com.jorge.api.model.Course;
 import com.jorge.api.model.Student;
-import com.jorge.api.repository.EmptyEntity;
+import com.jorge.api.repository.EmptyEntityImpl;
+import com.jorge.api.repository.IEmptyEntity;
 import com.jorge.api.repository.StudentRepository;
 import com.jorge.api.request.CourseRequest;
 import com.jorge.api.request.StudentRequest;
@@ -85,6 +87,16 @@ class StudentServiceTest {
     }
 
     @Test
+    public void saveShouldThrowAnExceptionWhenNameIsMissing() {
+        Exception exception = assertThrows(ApiRequestException.class, () -> {
+            studentService.save(StudentRequest.builder().name(null).build());
+        });
+        String expectedMessage = "The Student name is required";
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
     void update() {
         //Given
         Student c = Student.builder().id(1L).name("Jorge").build();
@@ -99,6 +111,16 @@ class StudentServiceTest {
     }
 
     @Test
+    public void updateShouldThrowAnExceptionWhenNameIsMissing() {
+        Exception exception = assertThrows(ApiRequestException.class, () -> {
+            studentService.update(1L, StudentRequest.builder().name(null).build());
+        });
+        String expectedMessage = "The Student name is required";
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
     void delete() {
         //Given
         when(studentRepository.existsById(any())).thenReturn(true);
@@ -110,9 +132,20 @@ class StudentServiceTest {
     }
 
     @Test
+    public void deleteShouldThrowAnExceptionWhenStudentDoesNotExist() {
+        when(studentRepository.existsById(any())).thenReturn(false);
+        Exception exception = assertThrows(ApiRequestException.class, () -> {
+            studentService.delete(1L);
+        });
+        String expectedMessage = "Student with Id: 1 does not exist";
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
     void getStudentsWithoutCourses() {
         //Given
-        List<EmptyEntity> emptyEntities = Stream.of(EmptyEntity.builder().id(1L).name("Jorge").build()).collect(Collectors.toList());
+        List<IEmptyEntity> emptyEntities = Stream.of(new EmptyEntityImpl(1L, "Jorge")).collect(Collectors.toList());
         when(studentRepository.fetchStudentsWithoutCourses()).thenReturn(emptyEntities);
         //When
         List<StudentResponse> coursesFound = studentService.getStudentsWithoutCourses();

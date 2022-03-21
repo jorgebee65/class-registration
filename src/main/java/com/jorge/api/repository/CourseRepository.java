@@ -11,5 +11,7 @@ import java.util.List;
 public interface CourseRepository extends JpaRepository<Course, Long> {
 
     @Query(value = "SELECT A.id AS id, A.name as name FROM courses as A LEFT JOIN student_courses as B ON A.id = B.course_id WHERE B.student_id is NULL", nativeQuery = true)
-    List<EmptyEntity> fetchCoursesWithoutStudents();
+    List<IEmptyEntity> fetchCoursesWithoutStudents();
+
+    List<Course> findByNameEquals(String name);
 }

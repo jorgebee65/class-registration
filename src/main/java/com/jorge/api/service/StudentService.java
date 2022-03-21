@@ -6,6 +6,7 @@ import com.jorge.api.repository.StudentRepository;
 import com.jorge.api.request.StudentRequest;
 import com.jorge.api.response.CourseResponse;
 import com.jorge.api.response.StudentResponse;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,12 +37,18 @@ public class StudentService {
     }
 
     public Student save(StudentRequest studentRequest){
+        if(StringUtils.isEmpty(studentRequest.getName())){
+            throw new ApiRequestException("The Student name is required");
+        }
         return studentRepository.save(Student.builder()
                 .name(studentRequest.getName())
                 .build());
     }
 
     public Student update(Long id, StudentRequest studentRequest){
+        if(StringUtils.isEmpty(studentRequest.getName())){
+            throw new ApiRequestException("The Student name is required");
+        }
         Student student = studentRepository.findById(id)
                 .orElseThrow(()-> new ApiRequestException("Not found Student with Id: "+id));
         student.setName(studentRequest.getName());
