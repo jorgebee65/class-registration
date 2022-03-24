@@ -1,16 +1,19 @@
 package com.jorge.api.service;
 
+import com.jorge.api.dto.RegisterDto;
 import com.jorge.api.exception.ApiRequestException;
 import com.jorge.api.model.Course;
 import com.jorge.api.model.Student;
 import com.jorge.api.repository.CourseRepository;
 import com.jorge.api.repository.StudentRepository;
-import com.jorge.api.request.RegisterRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+
 @Service
+@Transactional
 public class RegisterService {
 
     private final StudentRepository studentRepository;
@@ -27,7 +30,7 @@ public class RegisterService {
         this.courseRepository = courseRepository;
     }
 
-    public Student save(RegisterRequest registerRequest) {
+    public Student save(RegisterDto registerRequest) {
         if(null == registerRequest.getStudentId() ){
             throw new ApiRequestException("Student ID is required");
         }
@@ -48,7 +51,7 @@ public class RegisterService {
             throw new ApiRequestException( "Only allowed a maximum of "+maxCoursesPerStudent+" Courses by Student, currently you have "
                     +student.getCourses().size()+" courses and you are trying to register "+registerRequest.getCourses().size()+" more.");
         }
-            for(RegisterRequest.CourseRequest courseRequest: registerRequest.getCourses()){
+            for(RegisterDto.CourseRequest courseRequest: registerRequest.getCourses()){
                 Course c = courseRepository.findById(courseRequest.getId()).orElseThrow(()-> new ApiRequestException("Not found Course with Id: "+courseRequest.getId()));
                 if(c.getStudents().size()>=maxStudentsPerCourse){
                     throw new ApiRequestException("The Course "+c.getName()+" is full, it only accepts "+maxStudentsPerCourse+ " students");

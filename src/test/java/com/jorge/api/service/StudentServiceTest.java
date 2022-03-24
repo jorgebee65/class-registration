@@ -6,10 +6,6 @@ import com.jorge.api.model.Student;
 import com.jorge.api.repository.EmptyEntityImpl;
 import com.jorge.api.repository.IEmptyEntity;
 import com.jorge.api.repository.StudentRepository;
-import com.jorge.api.request.CourseRequest;
-import com.jorge.api.request.StudentRequest;
-import com.jorge.api.response.CourseResponse;
-import com.jorge.api.response.StudentResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -51,7 +47,7 @@ class StudentServiceTest {
         Student c = Student.builder().id(1L).name("Jorge").build();
         when(studentRepository.findById(1L)).thenReturn(Optional.ofNullable(c));
         //When
-        Student studentFound = studentService.getStudentById(1L);
+        Student studentFound = studentService.findStudentById(1L);
         //Then
         assertNotNull(studentFound);
         assertSame("Jorge", studentFound.getName());
@@ -67,7 +63,7 @@ class StudentServiceTest {
                 .build();
         when(studentRepository.findById(1L)).thenReturn(Optional.ofNullable(c));
         //When
-        List<CourseResponse> courses = studentService.getCoursesByStudent(1L);
+        List<Course> courses = studentService.findCoursesByStudent(1L);
         //Then
         assertNotNull(courses);
         assertFalse(courses.isEmpty());
@@ -80,7 +76,7 @@ class StudentServiceTest {
         Student c = Student.builder().id(1L).name("Jorge").build();
         when(studentRepository.save(any())).thenReturn(c);
         //When
-        Student studentFound = studentService.save(StudentRequest.builder().name("Jorge").build());
+        Student studentFound = studentService.saveStudent(Student.builder().name("Jorge").email("email@gmail.com").build());
         //Then
         assertNotNull(studentFound);
         assertSame("Jorge", studentFound.getName());
@@ -89,7 +85,7 @@ class StudentServiceTest {
     @Test
     public void saveShouldThrowAnExceptionWhenNameIsMissing() {
         Exception exception = assertThrows(ApiRequestException.class, () -> {
-            studentService.save(StudentRequest.builder().name(null).build());
+            studentService.saveStudent(Student.builder().name(null).build());
         });
         String expectedMessage = "The Student name is required";
         String actualMessage = exception.getMessage();
@@ -104,7 +100,7 @@ class StudentServiceTest {
         Student cu = Student.builder().id(1L).name("Jorge2").build();
         when(studentRepository.save(any())).thenReturn(cu);
         //When
-        Student studentFound = studentService.update(1L, StudentRequest.builder().name("Jorge2").build());
+        Student studentFound = studentService.saveStudent(Student.builder().id(1L).name("Jorge2").email("email@gmail.com").build());
         //Then
         assertNotNull(studentFound);
         assertSame("Jorge2", studentFound.getName());
@@ -113,7 +109,7 @@ class StudentServiceTest {
     @Test
     public void updateShouldThrowAnExceptionWhenNameIsMissing() {
         Exception exception = assertThrows(ApiRequestException.class, () -> {
-            studentService.update(1L, StudentRequest.builder().name(null).build());
+            studentService.saveStudent(Student.builder().id(1L).name(null).build());
         });
         String expectedMessage = "The Student name is required";
         String actualMessage = exception.getMessage();
@@ -126,7 +122,7 @@ class StudentServiceTest {
         when(studentRepository.existsById(any())).thenReturn(true);
         doNothing().when(studentRepository).deleteById(any());
         //When
-        studentService.delete(1L);
+        studentService.deleteStudent(1L);
         //Then
         verify(studentRepository, times(1)).deleteById(1L);
     }
@@ -135,7 +131,7 @@ class StudentServiceTest {
     public void deleteShouldThrowAnExceptionWhenStudentDoesNotExist() {
         when(studentRepository.existsById(any())).thenReturn(false);
         Exception exception = assertThrows(ApiRequestException.class, () -> {
-            studentService.delete(1L);
+            studentService.deleteStudent(1L);
         });
         String expectedMessage = "Student with Id: 1 does not exist";
         String actualMessage = exception.getMessage();
@@ -148,7 +144,7 @@ class StudentServiceTest {
         List<IEmptyEntity> emptyEntities = Stream.of(new EmptyEntityImpl(1L, "Jorge")).collect(Collectors.toList());
         when(studentRepository.fetchStudentsWithoutCourses()).thenReturn(emptyEntities);
         //When
-        List<StudentResponse> coursesFound = studentService.getStudentsWithoutCourses();
+        List<Student> coursesFound = studentService.findStudentsWithoutCourses();
         //Then
         assertEquals(1, coursesFound.size());
     }

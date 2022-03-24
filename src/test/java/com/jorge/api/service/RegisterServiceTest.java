@@ -1,11 +1,11 @@
 package com.jorge.api.service;
 
+import com.jorge.api.dto.RegisterDto;
 import com.jorge.api.exception.ApiRequestException;
 import com.jorge.api.model.Course;
 import com.jorge.api.model.Student;
 import com.jorge.api.repository.CourseRepository;
 import com.jorge.api.repository.StudentRepository;
-import com.jorge.api.request.RegisterRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -42,7 +42,7 @@ public class RegisterServiceTest {
     @Test
     public void itShouldThrowAnExceptionWhenStudentIdIsMissing() {
         Exception exception = assertThrows(ApiRequestException.class, () -> {
-            registerService.save(RegisterRequest.builder().studentId(null).build());
+            registerService.save(RegisterDto.builder().studentId(null).build());
         });
         String expectedMessage = "Student ID is required";
         String actualMessage = exception.getMessage();
@@ -52,7 +52,7 @@ public class RegisterServiceTest {
     @Test
     public void itShouldThrowAnExceptionWhenCoursesAreMissing() {
         Exception exception = assertThrows(ApiRequestException.class, () -> {
-            registerService.save(RegisterRequest.builder().studentId(1L).build());
+            registerService.save(RegisterDto.builder().studentId(1L).build());
         });
         String expectedMessage = "Please provide the list of courses to register";
         String actualMessage = exception.getMessage();
@@ -62,9 +62,9 @@ public class RegisterServiceTest {
     @Test
     public void itShouldThrowAnExceptionWhenACourseIdIsMissing() {
         Exception exception = assertThrows(ApiRequestException.class, () -> {
-            registerService.save(RegisterRequest.builder().studentId(1L)
+            registerService.save(RegisterDto.builder().studentId(1L)
                     .courses(Stream.of(
-                            RegisterRequest.CourseRequest.builder()
+                            RegisterDto.CourseRequest.builder()
                                     .name("React")
                                     .build()
                     ).collect(Collectors.toSet()))
@@ -78,9 +78,9 @@ public class RegisterServiceTest {
     @Test
     public void itShouldThrowAnExceptionWhenACourseNameIsMissing() {
         Exception exception = assertThrows(ApiRequestException.class, () -> {
-            registerService.save(RegisterRequest.builder().studentId(1L)
+            registerService.save(RegisterDto.builder().studentId(1L)
                     .courses(Stream.of(
-                            RegisterRequest.CourseRequest.builder()
+                            RegisterDto.CourseRequest.builder()
                                     .id(3L)
                                     .build()
                     ).collect(Collectors.toSet()))
@@ -94,10 +94,10 @@ public class RegisterServiceTest {
     @Test
     public void itShouldThrowAnExceptionWhenStudentIdIsNotFounded() {
         //Given
-        RegisterRequest registerRequest = RegisterRequest.builder()
+        RegisterDto registerRequest = RegisterDto.builder()
                 .studentId(9L)
                 .courses(Stream.of(
-                        RegisterRequest.CourseRequest.builder()
+                        RegisterDto.CourseRequest.builder()
                                 .id(3L)
                                 .name("React")
                                 .build()
@@ -118,10 +118,10 @@ public class RegisterServiceTest {
     @Test
     public void itShouldThrowAnExceptionWhenTryToExceedTheMaximumCoursesNumberByStudent() {
         //Given
-        RegisterRequest registerRequest = RegisterRequest.builder()
+        RegisterDto registerRequest = RegisterDto.builder()
                 .studentId(1L)
                 .courses(Stream.of(
-                        RegisterRequest.CourseRequest.builder()
+                        RegisterDto.CourseRequest.builder()
                                 .id(4L)
                                 .name("JUnit")
                                 .build()
@@ -151,10 +151,10 @@ public class RegisterServiceTest {
     @Test
     public void itShouldThrowAnExceptionWhenTryToExceedTheMaximumStudentsNumberByCourse() {
         //Given
-        RegisterRequest registerRequest = RegisterRequest.builder()
+        RegisterDto registerRequest = RegisterDto.builder()
                 .studentId(1L)
                 .courses(Stream.of(
-                        RegisterRequest.CourseRequest.builder()
+                        RegisterDto.CourseRequest.builder()
                                 .id(4L)
                                 .name("JUnit")
                                 .build()
@@ -192,10 +192,10 @@ public class RegisterServiceTest {
     @Test
     public void itShouldThrowAnExceptionWhenACourseNameDoesNotMatchWithTheRequested() {
         //Given
-        RegisterRequest registerRequest = RegisterRequest.builder()
+        RegisterDto registerRequest = RegisterDto.builder()
                 .studentId(1L)
                 .courses(Stream.of(
-                        RegisterRequest.CourseRequest.builder()
+                        RegisterDto.CourseRequest.builder()
                                 .id(4L)
                                 .name("JUnit")
                                 .build()
@@ -229,10 +229,10 @@ public class RegisterServiceTest {
     @Test
     public void itShouldThrowAnExceptionWhenTryToRegisterADuplicatedCourse() {
         //Given
-        RegisterRequest registerRequest = RegisterRequest.builder()
+        RegisterDto registerRequest = RegisterDto.builder()
                 .studentId(1L)
                 .courses(Stream.of(
-                        RegisterRequest.CourseRequest.builder()
+                        RegisterDto.CourseRequest.builder()
                                 .id(4L)
                                 .name("JUnit")
                                 .build()
@@ -266,10 +266,10 @@ public class RegisterServiceTest {
     @Test
     public void registerUserSuccessful() {
         //Given
-        RegisterRequest registerRequest = RegisterRequest.builder()
+        RegisterDto registerRequest = RegisterDto.builder()
                 .studentId(1L)
                 .courses(Stream.of(
-                        RegisterRequest.CourseRequest.builder()
+                        RegisterDto.CourseRequest.builder()
                                 .id(3L)
                                 .name("React")
                                 .build()
