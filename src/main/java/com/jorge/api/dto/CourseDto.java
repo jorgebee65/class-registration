@@ -1,4 +1,4 @@
-package com.jorge.api.response;
+package com.jorge.api.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class StudentResponse {
+public class CourseDto {
     private Long id;
     private String name;
 }

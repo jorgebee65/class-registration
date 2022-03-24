@@ -1,19 +1,21 @@
-package com.jorge.api.response;
+package com.jorge.api.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CourseFullResponse {
+public class StudentDto {
     private Long id;
     private String name;
+    private String email;
+    private String mobilePhone;
 
-    private List<StudentResponse> students;
+    private Set<CourseDto> courses;
 }

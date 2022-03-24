@@ -25,6 +25,12 @@ public class Student {
     @Column
     private String name;
 
+    @Column
+    private String email;
+
+    @Column
+    private String mobilePhone;
+
     @ManyToMany(
             fetch = FetchType.LAZY,
             cascade = {

@@ -1,4 +1,4 @@
-package com.jorge.api.request;
+package com.jorge.api.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,9 +11,9 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegisterRequest {
+public class RegisterDto {
     private Long studentId;
-    private Set<RegisterRequest.CourseRequest> courses;
+    private Set<RegisterDto.CourseRequest> courses;
 
     @Data
     @Builder

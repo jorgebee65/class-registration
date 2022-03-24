@@ -6,11 +6,6 @@ import com.jorge.api.model.Student;
 import com.jorge.api.repository.CourseRepository;
 import com.jorge.api.repository.EmptyEntityImpl;
 import com.jorge.api.repository.IEmptyEntity;
-import com.jorge.api.request.CourseRequest;
-import com.jorge.api.request.RegisterRequest;
-import com.jorge.api.response.CourseFullResponse;
-import com.jorge.api.response.CourseResponse;
-import com.jorge.api.response.StudentResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,7 +32,7 @@ class CourseServiceTest {
     @Test
     public void saveShouldThrowAnExceptionWhenNameIsMissing() {
         Exception exception = assertThrows(ApiRequestException.class, () -> {
-            courseService.save(CourseRequest.builder().name(null).build());
+            courseService.saveCourse(Course.builder().name(null).build());
         });
         String expectedMessage = "The Course name is required";
         String actualMessage = exception.getMessage();
@@ -50,7 +45,7 @@ class CourseServiceTest {
                 .thenReturn(Stream.of(Course.builder().id(1L).name("Java").build()).collect(Collectors.toList()));
 
         Exception exception = assertThrows(ApiRequestException.class, () -> {
-            courseService.save(CourseRequest.builder().name("Java").build());
+            courseService.saveCourse(Course.builder().name("Java").build());
         });
         String expectedMessage = "The Course with name Java already exist";
         String actualMessage = exception.getMessage();
@@ -63,7 +58,7 @@ class CourseServiceTest {
         List<Course> courses = Stream.of(Course.builder().id(1L).name("Java").build()).collect(Collectors.toList());
         when(courseRepository.findAll()).thenReturn(courses);
         //When
-        List<Course> coursesFound = courseService.getAllCourses();
+        List<Course> coursesFound = courseService.findAllCourses();
         //Then
         assertEquals(1, coursesFound.size());
     }
@@ -74,7 +69,7 @@ class CourseServiceTest {
         Course c = Course.builder().id(1L).name("Java").build();
         when(courseRepository.findById(1L)).thenReturn(Optional.ofNullable(c));
         //When
-        Course courseFound = courseService.getCourseById(1L);
+        Course courseFound = courseService.findCourseById(1L);
         //Then
         assertNotNull(courseFound);
         assertSame("Java", courseFound.getName());
@@ -90,7 +85,7 @@ class CourseServiceTest {
                 .build();
         when(courseRepository.findById(1L)).thenReturn(Optional.ofNullable(c));
         //When
-        List<StudentResponse> students = courseService.getAllStudentsFromCourse(1L);
+        List<Student> students = courseService.getAllStudentsFromCourse(1L);
         //Then
         assertNotNull(students);
         assertFalse(students.isEmpty());
@@ -103,7 +98,7 @@ class CourseServiceTest {
         Course c = Course.builder().id(1L).name("Java").build();
         when(courseRepository.save(any())).thenReturn(c);
         //When
-        Course courseFound = courseService.save(CourseRequest.builder().name("Java").build());
+        Course courseFound = courseService.saveCourse(Course.builder().name("Java").build());
         //Then
         assertNotNull(courseFound);
         assertSame("Java", courseFound.getName());
@@ -117,7 +112,7 @@ class CourseServiceTest {
         Course cu = Course.builder().id(1L).name("Java2").build();
         when(courseRepository.save(any())).thenReturn(cu);
         //When
-        Course courseUpdated = courseService.update(1L, CourseRequest.builder().name("Java2").build());
+        Course courseUpdated = courseService.saveCourse( Course.builder().id(1L).name("Java2").build());
         //Then
         assertNotNull(courseUpdated);
         assertSame("Java2", courseUpdated.getName());
@@ -126,7 +121,7 @@ class CourseServiceTest {
     @Test
     public void updateShouldThrowAnExceptionWhenNameIsMissing() {
         Exception exception = assertThrows(ApiRequestException.class, () -> {
-            courseService.update(1L, CourseRequest.builder().name(null).build());
+            courseService.saveCourse( Course.builder().id(1L).name(null).build());
         });
         String expectedMessage = "The Course name is required";
         String actualMessage = exception.getMessage();
@@ -139,7 +134,7 @@ class CourseServiceTest {
         when(courseRepository.existsById(any())).thenReturn(true);
         doNothing().when(courseRepository).deleteById(any());
         //When
-        courseService.delete(1L);
+        courseService.deleteCourse(1L);
         //Then
         verify(courseRepository, times(1)).deleteById(1L);
     }
@@ -148,7 +143,7 @@ class CourseServiceTest {
     public void deleteShouldThrowAnExceptionWhenCourseDoesNotExist() {
         when(courseRepository.existsById(any())).thenReturn(false);
         Exception exception = assertThrows(ApiRequestException.class, () -> {
-            courseService.delete(1L);
+            courseService.deleteCourse(1L);
         });
         String expectedMessage = "Not found Course with Id: 1";
         String actualMessage = exception.getMessage();
@@ -161,7 +156,7 @@ class CourseServiceTest {
         List<IEmptyEntity> emptyEntities = Stream.of(new EmptyEntityImpl(1L, "Java")).collect(Collectors.toList());
         when(courseRepository.fetchCoursesWithoutStudents()).thenReturn(emptyEntities);
         //When
-        List<CourseResponse> coursesFound = courseService.getCoursesWithoutStudents();
+        List<Course> coursesFound = courseService.findCoursesWithoutStudents();
         //Then
         assertEquals(1, coursesFound.size());
     }
@@ -176,7 +171,7 @@ class CourseServiceTest {
                 .build();
         when(courseRepository.findAll()).thenReturn(Collections.singletonList(c));
         //When
-        List<CourseFullResponse> students = courseService.getCoursesWithStudents();
+        List<Course> students = courseService.findCoursesWithStudents();
         //Then
         assertNotNull(students);
         assertFalse(students.isEmpty());
