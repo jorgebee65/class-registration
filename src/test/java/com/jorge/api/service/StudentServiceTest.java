@@ -1,5 +1,7 @@
 package com.jorge.api.service;
 
+import com.jorge.api.dto.CourseDto;
+import com.jorge.api.dto.StudentDto;
 import com.jorge.api.exception.ApiRequestException;
 import com.jorge.api.model.Course;
 import com.jorge.api.model.Student;
@@ -36,7 +38,7 @@ class StudentServiceTest {
         List<Student> students = Stream.of(Student.builder().id(1L).name("Jorge").build()).collect(Collectors.toList());
         when(studentRepository.findAll()).thenReturn(students);
         //When
-        List<Student> studentsFound = studentService.getAllStudents();
+        List<StudentDto> studentsFound = studentService.getAllStudents();
         //Then
         assertEquals(1, studentsFound.size());
     }
@@ -47,7 +49,7 @@ class StudentServiceTest {
         Student c = Student.builder().id(1L).name("Jorge").build();
         when(studentRepository.findById(1L)).thenReturn(Optional.ofNullable(c));
         //When
-        Student studentFound = studentService.findStudentById(1L);
+        StudentDto studentFound = studentService.findStudentById(1L);
         //Then
         assertNotNull(studentFound);
         assertSame("Jorge", studentFound.getName());
@@ -63,7 +65,7 @@ class StudentServiceTest {
                 .build();
         when(studentRepository.findById(1L)).thenReturn(Optional.ofNullable(c));
         //When
-        List<Course> courses = studentService.findCoursesByStudent(1L);
+        List<CourseDto> courses = studentService.findCoursesByStudent(1L);
         //Then
         assertNotNull(courses);
         assertFalse(courses.isEmpty());
@@ -76,7 +78,7 @@ class StudentServiceTest {
         Student c = Student.builder().id(1L).name("Jorge").build();
         when(studentRepository.save(any())).thenReturn(c);
         //When
-        Student studentFound = studentService.saveStudent(Student.builder().name("Jorge").email("email@gmail.com").build());
+        StudentDto studentFound = studentService.saveStudent(StudentDto.builder().name("Jorge").email("email@gmail.com").build());
         //Then
         assertNotNull(studentFound);
         assertSame("Jorge", studentFound.getName());
@@ -85,7 +87,7 @@ class StudentServiceTest {
     @Test
     public void saveShouldThrowAnExceptionWhenNameIsMissing() {
         Exception exception = assertThrows(ApiRequestException.class, () -> {
-            studentService.saveStudent(Student.builder().name(null).build());
+            studentService.saveStudent(StudentDto.builder().name(null).build());
         });
         String expectedMessage = "The Student name is required";
         String actualMessage = exception.getMessage();
@@ -100,7 +102,7 @@ class StudentServiceTest {
         Student cu = Student.builder().id(1L).name("Jorge2").build();
         when(studentRepository.save(any())).thenReturn(cu);
         //When
-        Student studentFound = studentService.saveStudent(Student.builder().id(1L).name("Jorge2").email("email@gmail.com").build());
+        StudentDto studentFound = studentService.saveStudent(StudentDto.builder().id(1L).name("Jorge2").email("email@gmail.com").build());
         //Then
         assertNotNull(studentFound);
         assertSame("Jorge2", studentFound.getName());
@@ -109,7 +111,7 @@ class StudentServiceTest {
     @Test
     public void updateShouldThrowAnExceptionWhenNameIsMissing() {
         Exception exception = assertThrows(ApiRequestException.class, () -> {
-            studentService.saveStudent(Student.builder().id(1L).name(null).build());
+            studentService.saveStudent(StudentDto.builder().id(1L).name(null).build());
         });
         String expectedMessage = "The Student name is required";
         String actualMessage = exception.getMessage();
@@ -144,7 +146,7 @@ class StudentServiceTest {
         List<IEmptyEntity> emptyEntities = Stream.of(new EmptyEntityImpl(1L, "Jorge")).collect(Collectors.toList());
         when(studentRepository.fetchStudentsWithoutCourses()).thenReturn(emptyEntities);
         //When
-        List<Student> coursesFound = studentService.findStudentsWithoutCourses();
+        List<StudentDto> coursesFound = studentService.findStudentsWithoutCourses();
         //Then
         assertEquals(1, coursesFound.size());
     }

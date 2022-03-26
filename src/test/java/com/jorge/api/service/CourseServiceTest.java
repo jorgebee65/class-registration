@@ -1,5 +1,8 @@
 package com.jorge.api.service;
 
+import com.jorge.api.dto.CourseDto;
+import com.jorge.api.dto.CourseFullDto;
+import com.jorge.api.dto.StudentDto;
 import com.jorge.api.exception.ApiRequestException;
 import com.jorge.api.model.Course;
 import com.jorge.api.model.Student;
@@ -10,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +36,7 @@ class CourseServiceTest {
     @Test
     public void saveShouldThrowAnExceptionWhenNameIsMissing() {
         Exception exception = assertThrows(ApiRequestException.class, () -> {
-            courseService.saveCourse(Course.builder().name(null).build());
+            courseService.saveCourse(CourseDto.builder().name(null).build());
         });
         String expectedMessage = "The Course name is required";
         String actualMessage = exception.getMessage();
@@ -45,7 +49,7 @@ class CourseServiceTest {
                 .thenReturn(Stream.of(Course.builder().id(1L).name("Java").build()).collect(Collectors.toList()));
 
         Exception exception = assertThrows(ApiRequestException.class, () -> {
-            courseService.saveCourse(Course.builder().name("Java").build());
+            courseService.saveCourse(CourseDto.builder().name("Java").build());
         });
         String expectedMessage = "The Course with name Java already exist";
         String actualMessage = exception.getMessage();
@@ -58,7 +62,7 @@ class CourseServiceTest {
         List<Course> courses = Stream.of(Course.builder().id(1L).name("Java").build()).collect(Collectors.toList());
         when(courseRepository.findAll()).thenReturn(courses);
         //When
-        List<Course> coursesFound = courseService.findAllCourses();
+        List<CourseDto> coursesFound = courseService.findAllCourses();
         //Then
         assertEquals(1, coursesFound.size());
     }
@@ -69,7 +73,7 @@ class CourseServiceTest {
         Course c = Course.builder().id(1L).name("Java").build();
         when(courseRepository.findById(1L)).thenReturn(Optional.ofNullable(c));
         //When
-        Course courseFound = courseService.findCourseById(1L);
+        CourseFullDto courseFound = courseService.findCourseById(1L);
         //Then
         assertNotNull(courseFound);
         assertSame("Java", courseFound.getName());
@@ -85,7 +89,7 @@ class CourseServiceTest {
                 .build();
         when(courseRepository.findById(1L)).thenReturn(Optional.ofNullable(c));
         //When
-        List<Student> students = courseService.getAllStudentsFromCourse(1L);
+        List<StudentDto> students = courseService.getAllStudentsFromCourse(1L);
         //Then
         assertNotNull(students);
         assertFalse(students.isEmpty());
@@ -98,7 +102,7 @@ class CourseServiceTest {
         Course c = Course.builder().id(1L).name("Java").build();
         when(courseRepository.save(any())).thenReturn(c);
         //When
-        Course courseFound = courseService.saveCourse(Course.builder().name("Java").build());
+        CourseDto courseFound = courseService.saveCourse(CourseDto.builder().name("Java").build());
         //Then
         assertNotNull(courseFound);
         assertSame("Java", courseFound.getName());
@@ -112,7 +116,7 @@ class CourseServiceTest {
         Course cu = Course.builder().id(1L).name("Java2").build();
         when(courseRepository.save(any())).thenReturn(cu);
         //When
-        Course courseUpdated = courseService.saveCourse( Course.builder().id(1L).name("Java2").build());
+        CourseDto courseUpdated = courseService.saveCourse(CourseDto.builder().id(1L).name("Java2").build());
         //Then
         assertNotNull(courseUpdated);
         assertSame("Java2", courseUpdated.getName());
@@ -121,7 +125,7 @@ class CourseServiceTest {
     @Test
     public void updateShouldThrowAnExceptionWhenNameIsMissing() {
         Exception exception = assertThrows(ApiRequestException.class, () -> {
-            courseService.saveCourse( Course.builder().id(1L).name(null).build());
+            courseService.saveCourse(CourseDto.builder().id(1L).name(null).build());
         });
         String expectedMessage = "The Course name is required";
         String actualMessage = exception.getMessage();
@@ -156,7 +160,7 @@ class CourseServiceTest {
         List<IEmptyEntity> emptyEntities = Stream.of(new EmptyEntityImpl(1L, "Java")).collect(Collectors.toList());
         when(courseRepository.fetchCoursesWithoutStudents()).thenReturn(emptyEntities);
         //When
-        List<Course> coursesFound = courseService.findCoursesWithoutStudents();
+        List<CourseDto> coursesFound = courseService.findCoursesWithoutStudents();
         //Then
         assertEquals(1, coursesFound.size());
     }
@@ -171,7 +175,7 @@ class CourseServiceTest {
                 .build();
         when(courseRepository.findAll()).thenReturn(Collections.singletonList(c));
         //When
-        List<Course> students = courseService.findCoursesWithStudents();
+        List<CourseFullDto> students = courseService.findCoursesWithStudents();
         //Then
         assertNotNull(students);
         assertFalse(students.isEmpty());
